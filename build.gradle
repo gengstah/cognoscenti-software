@@ -1,0 +1,69 @@
+apply plugin: 'gae'
+apply plugin: 'eclipse'
+apply plugin: 'jetty'
+
+def springVersion = "3.2.2.RELEASE"
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+
+	dependencies {
+		classpath 'org.gradle.api.plugins:gradle-gae-plugin:0.8'
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	providedCompile "javax.servlet:servlet-api:2.5"
+	
+	testCompile "junit:junit:4.+"
+	testCompile "org.mockito:mockito-all:1.9.5"
+	
+	compile "log4j:log4j:1.2.16"
+	compile "org.slf4j:slf4j-api:1.7.2"
+	compile "org.slf4j:slf4j-log4j12:1.7.2"
+	
+	compile "org.springframework:spring-core:$springVersion"
+	compile "org.springframework:spring-context:$springVersion"
+	compile "org.springframework:spring-web:$springVersion"
+	compile "org.springframework:spring-webmvc:$springVersion"
+	
+	compile "jstl:jstl:1.2"
+}
+
+task wrapper(type: Wrapper) {
+	description = 'Generates gradlew[.bat] scripts'
+    gradleVersion = '1.4'
+}
+
+task initProject () << {
+	project.apply { plugin('war') }
+
+	project.sourceSets*.allSource.srcDirTrees.flatten().dir.each { dir ->
+		dir.mkdirs()
+	}
+}
+
+gae {
+    httpPort = 8080
+    optimizeWar = false
+
+    appcfg {
+        email = '...'
+        password = '...'
+
+        logs {
+            severity = 1
+            outputFile = file('logs.txt')
+        }
+
+        app {
+            id = 'cognoscenti-software'
+        }
+    }
+}
